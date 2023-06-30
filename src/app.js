@@ -48,7 +48,7 @@ app.get("/participants", (req,res) => {
     const users = db.collection("participantes").find();
     res.send(users);
 })
-
+,
 
 
 
