@@ -5,21 +5,20 @@ import cors from "cors";
 
 /// Imports Database & Security
 import { MongoClient } from "mongodb";
-
 import dotenv from "dotenv";
+dotenv.config();
 
 
 /// API Connection ///
 const app = express();
 app.use(express.json());
-app.use(cors);
+app.use(cors());
 
 
 
 
 /// Database Connection ///
-//const mongoClient = new MongoClient(process.env.DATABASE_URL);
-const mongoClient = new MongoClient("mongodb://localhost:27017/teste");
+const mongoClient = new MongoClient(process.env.DATABASE_URL);
 let db;
 
 mongoClient.connect()
