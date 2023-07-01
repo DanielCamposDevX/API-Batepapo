@@ -33,6 +33,16 @@ const schemauser = Joi.object({
     name: Joi.string()
         .min(1),
 })
+const schemamsg = Joi.object({
+    to: Joi.string()
+        .min(1),
+    text: Joi.string()
+        .min(1),
+    type: Joi.string()
+        .valid("message", "private-message"),
+    from: Joi.string(),
+    time: Joi.string()
+})
 
 
 // User login //
@@ -81,19 +91,49 @@ app.post("/participants", async (req, res) => {
 
 
 // Loading Users //
-
 app.get("/participants", async (req, res) => {
     try {
         const users = await db.collection("participants").find().toArray();
         return res.send(users);
     }
-    catch(error){
+    catch (error) {
         console.log(error);
         return res.sendStatus(500);
     }
 })
 
 
+// Message posting //
+app.post("/messages", async (req, res) => {
+    const { to, text, type } = req.body;
+    const from = req.header('User');
+    try {
+        const user = await db.collection("participants").findOne({ name: from });
+        if (user) {
+            const msg = { to, text, type, from, time: dayjs().format('HH:mm:ss') };
+            const validate = schemamsg.validate(msg, { abortEarly: false });
+            if (validate.error) {
+                //const errors = validate.error.details.map((detail) => detail.message);
+                return res.sendStatus(422)//.send(errors);
+            }
+            else{
+                await db.collection("messages").insertOne(msg);
+                return res.status(201).send(msg);
+            }
+        }
+        else{
+            return res.sendStatus(422);
+        }
+    }
+    catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+
+
+
+
+})
 
 
 
