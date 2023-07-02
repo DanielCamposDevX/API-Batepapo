@@ -145,7 +145,7 @@ app.get("/messages", async (req, res) => {
             const messages = await db.collection('messages').find({
                 $or: [
                     { name: "todos" },
-                    { name: "user" }
+                    { name: user }
                 ]
             }).limit(limit).toArray();
 
