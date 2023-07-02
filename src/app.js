@@ -43,6 +43,37 @@ const schemamsg = Joi.object({
 })
 const limitschema = Joi.number().integer().positive().required();
 
+
+/// Status Updating ///
+setInterval(Inactive, 15000)
+const Inactive = async () => {
+    const validatedate = Date.now() - 10000;
+    try {
+        const removed = await db.collection('participants').find({
+            lastStatus: { $lt: validatedate }
+        }).toArray();
+        await db.collection('participants').deleteMany({
+            lastStatus: { $lt: validatedate }
+        });
+        await db.collection('messages').insertMany(removed.map(participant => ({
+            from: participant.name,
+            to: 'Todos',
+            text: 'sai da sala...',
+            type: 'status',
+            time: dayjs().format('HH:mm:ss')
+        })));
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+
+
+
+
+
+
+
 // User login //
 app.post("/participants", async (req, res) => {
 
@@ -177,9 +208,6 @@ app.post("/status", async (req, res) => {
         }
     }
 })
-
-
-
 
 
 
