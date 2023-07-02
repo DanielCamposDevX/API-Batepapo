@@ -86,8 +86,6 @@ app.post("/participants", async (req, res) => {
 })
 
 
-
-
 // Loading Users //
 app.get("/participants", async (req, res) => {
     try {
@@ -158,7 +156,27 @@ app.get("/messages", async (req, res) => {
 });
 
 
-
+// Status Online and Offline //
+app.post("/status", async (req, res) => {
+    const user = req.header('User');
+    const validation = await db.collection('participants').findOne({ name: user })
+    if (!user || !validation) {
+        return res.sendStatus(404);
+    }
+    else {
+        try {
+            await db.collection('participants').updateOne(
+                { _id: validation._id },
+                { $set: { lastStatus: Date.now() } }
+            )
+            return res.sendStatus(200);
+        }
+        catch (error) {
+            console.log(error);
+            return res.sendStatus(500);
+        }
+    }
+})
 
 
 
