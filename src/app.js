@@ -41,7 +41,7 @@ const schemamsg = Joi.object({
     type: Joi.string()
         .valid("message", "private-message"),
 })
-
+const limitschema = Joi.number().integer().positive().required();
 
 // User login //
 app.post("/participants", async (req, res) => {
@@ -115,12 +115,12 @@ app.post("/messages", async (req, res) => {
                 //const errors = validate.error.details.map((detail) => detail.message);
                 return res.sendStatus(422)//.send(errors);
             }
-            else{
+            else {
                 await db.collection("messages").insertOne(msg);
                 return res.status(201).send(msg);
             }
         }
-        else{
+        else {
             return res.sendStatus(422);
         }
     }
@@ -130,6 +130,32 @@ app.post("/messages", async (req, res) => {
     }
 })
 
+
+// Message Load //
+app.get("/messages", async (req, res) => {
+    const user = req.header('User');
+    const limit = parseInt(req.query.limit);
+    const validate = limitschema.validate(limit);
+    if (validate.error) {
+        //const errors = validate.error.details.map((detail) => detail.message);
+        return res.sendStatus(422)//.send(errors);
+    }
+    else {
+        try {
+            const messages = await db.collection('messages').find({
+                $or: [
+                    { name: "todos" },
+                    { name: "user" }
+                ]
+            }).limit(limit).toArray();
+
+            return res.send(messages);
+        } catch (error) {
+            console.log(error);
+            return res.sendStatus(500);
+        }
+    }
+});
 
 
 
