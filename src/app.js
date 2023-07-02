@@ -29,10 +29,8 @@ mongoClient.connect()
 ///////////////////// Code ///////////////////////
 
 //Schema for data Validation
-const schemauser = Joi.object({
-    name: Joi.string()
-        .min(1),
-})
+const schemauser = Joi.string().min(1);
+
 const schemamsg = Joi.object({
     to: Joi.string()
         .min(1),
@@ -68,17 +66,12 @@ const Inactive = async () => {
     }
 }
 
-
-
-
-
-
-
 // User login //
 app.post("/participants", async (req, res) => {
 
     const data = req.body;
-    const validate = schemauser.validate(data, { abortEarly: false });
+
+    const validate = schemauser.validate(data.name, { abortEarly: false });
 
     if (validate.error) {
 
@@ -114,6 +107,7 @@ app.post("/participants", async (req, res) => {
             return res.sendStatus(500);
         }
     }
+
 })
 
 
