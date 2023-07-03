@@ -74,7 +74,7 @@ app.post("/participants", async (req, res) => {
 
     const validate = schemauser.validate(data);
 
-    if (validate.error || !data) {
+    if (validate.error || !req.body.name) {
 
         const errors = validate.error.details.map((detail) => detail.message);
         res.status(422).send(errors)
@@ -161,13 +161,13 @@ app.get("/messages", async (req, res) => {
     const limit = parseInt(req.query.limit);
     if (!limit) {
         try {
-            const messages = await db.collection('messages').find({
+            const messages = await db.collection("messages").find({
                 $or: [
                     { to: "todos" },
                     { to: user },
                     { from: user }
                 ]
-            }).toArray();
+            }).limit(1).toArray();
 
             return res.status(200).send(messages);
         } catch (error) {
