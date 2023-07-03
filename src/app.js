@@ -37,7 +37,7 @@ const schemamsg = Joi.object({
     text: Joi.string()
         .min(1),
     type: Joi.string()
-        .valid("message", "private-message"),
+        .valid("message", "private_message"),
 })
 const limitschema = Joi.number().integer().positive().required();
 
@@ -167,7 +167,7 @@ app.get("/messages", async (req, res) => {
                     { to: user },
                     { from: user }
                 ]
-            }).limit(1).toArray();
+            }).toArray();
 
             return res.status(200).send(messages);
         } catch (error) {
