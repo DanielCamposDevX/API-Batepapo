@@ -72,7 +72,7 @@ app.post("/participants", async (req, res) => {
 
     const data = req.body;
 
-    const validate = schemauser.validate(data.name, { abortEarly: false });
+    const validate = schemauser.validate(data.name);
 
     if (validate.error) {
 
@@ -134,7 +134,7 @@ app.post("/messages", async (req, res) => {
         const user = await db.collection("participants").findOne({ name: from });
         if (user) {
             const msg = { to, text, type, from, time: dayjs().format('HH:mm:ss') };
-            const validate = schemamsg.validate(data, { abortEarly: false });
+            const validate = schemamsg.validate(data);
             if (validate.error) {
                 //const errors = validate.error.details.map((detail) => detail.message);
                 return res.sendStatus(422)//.send(errors);
@@ -156,27 +156,44 @@ app.post("/messages", async (req, res) => {
 
 
 // Message Load //
-app.get("/messages", async (req, res) => {
+app.get("/messages/:limit", async (req, res) => {
     const user = req.header('User');
-    const limit = parseInt(req.query.limit);
-    const validate = limitschema.validate(limit);
-    if (validate.error) {
-        //const errors = validate.error.details.map((detail) => detail.message);
-        return res.sendStatus(422)//.send(errors);
-    }
-    else {
+    const limit = parseInt(req.params.limit);
+    if (!limit) {
         try {
             const messages = await db.collection('messages').find({
                 $or: [
-                    { name: "todos" },
-                    { name: user }
+                    { to: "todos" },
+                    { to: user }
                 ]
-            }).limit(limit).toArray();
+            }).toArray();
 
             return res.send(messages);
         } catch (error) {
             console.log(error);
             return res.sendStatus(500);
+        }
+    }
+    else {
+        const validate = limitschema.validate(limit);
+        if (validate.error) {
+            //const errors = validate.error.details.map((detail) => detail.message);
+            return res.sendStatus(422)//.send(errors);
+        }
+        else {
+            try {
+                const messages = await db.collection('messages').find({
+                    $or: [
+                        { to: "todos" },
+                        { to: user }
+                    ]
+                }).limit(limit).toArray();
+
+                return res.send(messages);
+            } catch (error) {
+                console.log(error);
+                return res.sendStatus(500);
+            }
         }
     }
 });
