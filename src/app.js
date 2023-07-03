@@ -43,7 +43,6 @@ const limitschema = Joi.number().integer().positive().required();
 
 
 /// Status Updating ///
-setInterval(Inactive, 15000)
 const Inactive = async () => {
     const validatedate = Date.now() - 10000;
     try {
@@ -65,6 +64,8 @@ const Inactive = async () => {
         console.log(error);
     }
 }
+setInterval(Inactive, 15000)
+
 
 // User login //
 app.post("/participants", async (req, res) => {
