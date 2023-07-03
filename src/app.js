@@ -70,11 +70,11 @@ setInterval(Inactive, 15000)
 // User login //
 app.post("/participants", async (req, res) => {
 
-    const data = req.body;
+    const data = req.body.name;
 
-    const validate = schemauser.validate(data.name);
+    const validate = schemauser.validate(data);
 
-    if (validate.error) {
+    if (validate.error || !data) {
 
         const errors = validate.error.details.map((detail) => detail.message);
         res.status(422).send(errors)
@@ -82,7 +82,7 @@ app.post("/participants", async (req, res) => {
     }
     else {
 
-        const nome = data.name;
+        const nome = data;
 
         try {
             const user = await db.collection("participants").findOne({ name: nome });
@@ -135,7 +135,7 @@ app.post("/messages", async (req, res) => {
         if (user) {
             const msg = { to, text, type, from, time: dayjs().format('HH:mm:ss') };
             const validate = schemamsg.validate(data);
-            if (validate.error) {
+            if (validate.error || !to || !text || !type) {
                 //const errors = validate.error.details.map((detail) => detail.message);
                 return res.sendStatus(422)//.send(errors);
             }
