@@ -156,15 +156,16 @@ app.post("/messages", async (req, res) => {
 
 
 // Message Load //
-app.get("/messages/:limit", async (req, res) => {
+app.get("/messages", async (req, res) => {
     const user = req.header('User');
-    const limit = parseInt(req.params.limit);
+    const limit = parseInt(req.query.limit);
     if (!limit) {
         try {
             const messages = await db.collection('messages').find({
                 $or: [
                     { to: "todos" },
-                    { to: user }
+                    { to: user },
+                    { from: user }
                 ]
             }).toArray();
 
