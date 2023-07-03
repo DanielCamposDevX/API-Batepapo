@@ -76,8 +76,8 @@ app.post("/participants", async (req, res) => {
 
     if (validate.error) {
 
-        //const errors = validate.error.details.map((detail) => detail.message);
-        res.sendStatus(422)//.send(errors);
+        const errors = validate.error.details.map((detail) => detail.message);
+        res.status(422).send(errors)
 
     }
     else {
@@ -168,7 +168,7 @@ app.get("/messages/:limit", async (req, res) => {
                 ]
             }).toArray();
 
-            return res.send(messages);
+            return res.status(200).send(messages);
         } catch (error) {
             console.log(error);
             return res.sendStatus(500);
@@ -189,7 +189,7 @@ app.get("/messages/:limit", async (req, res) => {
                     ]
                 }).limit(limit).toArray();
 
-                return res.send(messages);
+                return res.status(200).send(messages);
             } catch (error) {
                 console.log(error);
                 return res.sendStatus(500);
